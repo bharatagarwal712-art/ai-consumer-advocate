@@ -12,27 +12,31 @@ export async function generateResponse(prompt: string) {
     modelId: process.env.BEDROCK_MODEL_ID!,
     contentType: "application/json",
     accept: "application/json",
+
     body: JSON.stringify({
-      anthropic_version: "bedrock-2023-05-31",
-      max_tokens: 1000,
-      temperature: 0.7,
       messages: [
         {
           role: "user",
-          content: [
-            {
-              type: "text",
-              text: prompt,
-            },
-          ],
+          content: prompt,
         },
       ],
+      max_tokens: 1000,
+      temperature: 0.7,
     }),
   });
 
   const response = await client.send(command);
+
   const decoded = new TextDecoder().decode(response.body);
+
+  console.log(decoded);
+
   const parsed = JSON.parse(decoded);
 
-  return parsed.content[0].text;
+  return (
+    parsed.choices?.[0]?.message?.content ||
+    parsed.output ||
+    parsed.generation ||
+    JSON.stringify(parsed)
+  );
 }
