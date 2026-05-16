@@ -60,7 +60,9 @@ Return ONLY valid JSON in this exact format:
     ];
 
     // Call Bedrock
-    const rawResponse = await generateResponse(finalMessages);
+   const rawResponse = await generateResponse(
+  JSON.stringify(finalMessages)
+);
 
     console.log("[route] RAW MODEL RESPONSE:", rawResponse);
 
