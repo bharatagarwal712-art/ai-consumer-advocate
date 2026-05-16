@@ -9,43 +9,35 @@ export async function POST(req: NextRequest) {
 
     const conversation = messages
       .map((m: any) => `${m.role}: ${m.content}`)
-      .join("\n");
+      .join("\\n");
 
     const prompt = `
 You are an AI consumer complaint assistant.
 
-Your goals:
-1. Understand the complaint.
-2. Ask ONE useful follow-up question if needed.
-3. Generate a strong complaint tweet.
+Generate:
+1. One follow-up question.
+2. One complaint tweet.
 
-Return ONLY valid JSON:
+Return ONLY valid JSON.
 
 {
-  "question": "string",
-  "tweet": "string"
+  "question": "...",
+  "tweet": "..."
 }
+
+Tone: ${tone}
 
 Conversation:
 ${conversation}
-
-Tone:
-${tone}
 `;
 
     const raw = await generateResponse(prompt);
 
     console.log(raw);
 
-    const parsed = JSON.parse(raw);
-
     return NextResponse.json({
-      question:
-        parsed.question ||
-        "Can you share any screenshots or proof?",
-      tweet:
-        parsed.tweet ||
-        "Unable to generate tweet right now.",
+      question: "Can you share screenshots if available?",
+      tweet: raw,
     });
   } catch (error) {
     console.error(error);
