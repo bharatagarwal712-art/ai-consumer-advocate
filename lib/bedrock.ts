@@ -8,24 +8,16 @@ const client = new BedrockRuntimeClient({
 });
 
 export async function generateResponse(prompt: string) {
-  const modelId = process.env.BEDROCK_MODEL_ID!;
-
-  const body = {
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    max_tokens: 1000,
-    temperature: 0.7,
-  };
-
   const command = new InvokeModelCommand({
-    modelId,
+    modelId: process.env.BEDROCK_MODEL_ID!,
     contentType: "application/json",
     accept: "application/json",
-    body: JSON.stringify(body),
+
+    body: JSON.stringify({
+      prompt: prompt,
+      max_tokens: 1000,
+      temperature: 0.7,
+    }),
   });
 
   const response = await client.send(command);
@@ -34,12 +26,5 @@ export async function generateResponse(prompt: string) {
 
   console.log(decoded);
 
-  const parsed = JSON.parse(decoded);
-
-  return (
-    parsed.choices?.[0]?.message?.content ||
-    parsed.output ||
-    parsed.generation ||
-    "No response"
-  );
+  return decoded;
 }
