@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateResponse } from "@/lib/bedrock";
+import { generateResponse, ChatMessage } from "@/lib/bedrock";
 
 export async function POST(req: NextRequest) {
   try {
@@ -7,48 +7,92 @@ export async function POST(req: NextRequest) {
 
     const { messages, tone } = body;
 
-    const conversation = messages
-      .map((m: any) => `${m.role}: ${m.content}`)
-      .join("\\n");
+    if (!messages || !Array.isArray(messages)) {
+      return NextResponse.json(
+        {
+          error: "messages array is required",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
 
-    const prompt = `
+    // Build conversation string
+    const conversation = messages
+      .map((m: ChatMessage) => `${m.role}: ${m.content}`)
+      .join("\n");
+
+    // System prompt
+    const systemPrompt = `
 You are an AI consumer complaint assistant.
 
-Generate:
-1. One follow-up question.
-2. One complaint tweet.
+Your goals:
+1. Understand the complaint.
+2. Ask ONE concise follow-up question if useful.
+3. Generate a strong public complaint tweet.
 
-Return ONLY valid JSON.
+Rules:
+- Avoid fabricated claims.
+- Avoid legal accusations.
+- Be concise.
+- Optimize for clarity and engagement.
+- Add relevant hashtags.
+- Tone should be ${tone}.
+
+Return ONLY valid JSON in this exact format:
 
 {
-  "question": "...",
-  "tweet": "..."
+  "question": "string",
+  "tweet": "string"
 }
-
-Tone: ${tone}
-
-Conversation:
-${conversation}
 `;
 
-    const raw = await generateResponse(prompt);
+    // Final messages for model
+    const finalMessages: ChatMessage[] = [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      {
+        role: "user",
+        content: conversation,
+      },
+    ];
 
-    console.log(raw);
+    // Call Bedrock
+    const rawResponse = await generateResponse(finalMessages);
+
+    let parsed;
+
+    try {
+      parsed = JSON.parse(rawResponse);
+    } catch {
+      console.error("[route] Failed to parse model JSON:", rawResponse);
+
+      return NextResponse.json({
+        question: "Can you provide more details?",
+        tweet: rawResponse,
+      });
+    }
 
     return NextResponse.json({
-      question: "Can you share screenshots if available?",
-      tweet: raw,
+      question:
+        parsed.question ||
+        "Can you share screenshots or additional details?",
+      tweet:
+        parsed.tweet ||
+        "Unable to generate tweet right now.",
     });
   } catch (error) {
-    console.error(error);
+    console.error("[route] Error:", error);
 
     return NextResponse.json(
       {
-        question: "Can you provide more details?",
-        tweet: "Unable to generate tweet.",
+        error: "Internal server error",
       },
       {
-        status: 200,
+        status: 500,
       }
     );
   }
