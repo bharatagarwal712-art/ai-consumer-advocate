@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateResponse, ChatMessage } from "@/lib/bedrock";
+import { generateResponse } from "@/lib/bedrock";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,9 +18,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Build conversation string
+    // Convert conversation into plain text
     const conversation = messages
-      .map((m: ChatMessage) => `${m.role}: ${m.content}`)
+      .map((m: any) => `${m.role}: ${m.content}`)
       .join("\n");
 
     // System prompt
@@ -29,16 +29,15 @@ You are an AI consumer complaint assistant.
 
 Your goals:
 1. Understand the complaint.
-2. Ask ONE concise follow-up question if useful.
-3. Generate a strong public complaint tweet.
+2. Ask ONE useful follow-up question if needed.
+3. Generate a strong complaint tweet.
 
 Rules:
-- Avoid fabricated claims.
-- Avoid legal accusations.
-- Be concise.
-- Optimize for clarity and engagement.
-- Add relevant hashtags.
-- Tone should be ${tone}.
+- Avoid fabricated claims
+- Avoid legal accusations
+- Keep tweets concise
+- Add relevant hashtags
+- Tone should be ${tone}
 
 Return ONLY valid JSON in this exact format:
 
@@ -48,8 +47,8 @@ Return ONLY valid JSON in this exact format:
 }
 `;
 
-    // Final messages for model
-    const finalMessages: ChatMessage[] = [
+    // Final message payload for DeepSeek
+    const finalMessages = [
       {
         role: "system",
         content: systemPrompt,
@@ -63,15 +62,17 @@ Return ONLY valid JSON in this exact format:
     // Call Bedrock
     const rawResponse = await generateResponse(finalMessages);
 
+    console.log("[route] RAW MODEL RESPONSE:", rawResponse);
+
     let parsed;
 
     try {
       parsed = JSON.parse(rawResponse);
-    } catch {
-      console.error("[route] Failed to parse model JSON:", rawResponse);
+    } catch (err) {
+      console.error("[route] JSON parse failed:", err);
 
       return NextResponse.json({
-        question: "Can you provide more details?",
+        question: "Can you share screenshots or additional proof?",
         tweet: rawResponse,
       });
     }
@@ -79,13 +80,13 @@ Return ONLY valid JSON in this exact format:
     return NextResponse.json({
       question:
         parsed.question ||
-        "Can you share screenshots or additional details?",
+        "Can you provide more details about the issue?",
       tweet:
         parsed.tweet ||
         "Unable to generate tweet right now.",
     });
   } catch (error) {
-    console.error("[route] Error:", error);
+    console.error("[route] ERROR:", error);
 
     return NextResponse.json(
       {
