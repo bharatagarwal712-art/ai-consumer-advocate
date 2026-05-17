@@ -1,5 +1,6 @@
+
 export async function findTwitterHandle(
-  company: string
+  conversation: string
 ): Promise<string | null> {
   try {
     const response = await fetch(
