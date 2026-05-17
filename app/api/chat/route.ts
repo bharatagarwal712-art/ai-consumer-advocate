@@ -82,14 +82,11 @@ Return ONLY valid JSON in this exact format:
       });
     }
 
-    return NextResponse.json({
-      question:
-        parsed.question ||
-        "Can you share screenshots or proof?",
-      tweet:
-        parsed.tweet ||
-        "Unable to generate tweet.",
-    });
+  return NextResponse.json({
+  needs_more_info: parsed.needs_more_info ?? false,
+  question: parsed.question || "",
+  tweet: parsed.tweet || "",
+});
   } catch (error) {
     console.error(error);
 
