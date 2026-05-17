@@ -120,10 +120,17 @@ Return ONLY valid JSON in this exact format:
     }
 
   return NextResponse.json({
+  debug: {
+    company,
+    officialHandle,
+  },
+
   needs_more_info: parsed.needs_more_info ?? false,
   question: parsed.question || "",
   tweet: parsed.tweet || "",
 });
+
+    
   } catch (error) {
     console.error(error);
 
