@@ -32,7 +32,7 @@ const company = companyRaw.trim();
 console.log("[COMPANY]", company);
 
     const officialHandle =
-  await findTwitterHandle(company);
+  await findTwitterHandle(conversation);
 
     console.log("[OFFICIAL HANDLE]", officialHandle);
 
