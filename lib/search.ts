@@ -11,10 +11,12 @@ export async function findTwitterHandle(
           "X-API-KEY": process.env.SERPER_API_KEY!,
           "Content-Type": "application/json",
         },
+body: JSON.stringify({
+  q: `
+${conversation}
 
-        body: JSON.stringify({
-          q: `${company} official X handle`,
-        }),
+official company twitter/x handle
+}),
       }
     );
 
