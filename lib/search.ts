@@ -19,7 +19,9 @@ export async function findTwitterHandle(
     );
 
     const data = await response.json();
-
+    
+console.log("[SERPER RESPONSE]", JSON.stringify(data));
+    
     const results = data.organic || [];
 
     for (const result of results) {
