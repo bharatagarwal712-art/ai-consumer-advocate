@@ -1,3 +1,4 @@
+import { findTwitterHandle } from "@/lib/search";
 import { NextRequest, NextResponse } from "next/server";
 import { generateResponse } from "@/lib/bedrock";
 
@@ -10,7 +11,31 @@ export async function POST(req: NextRequest) {
     const conversation = messages
       .map((m: any) => `${m.role}: ${m.content}`)
       .join("\n");
+const companyPrompt = `
+Extract ONLY the company name from this complaint.
 
+Complaint:
+${conversation}
+
+Return ONLY the company name.
+`;
+
+const companyRaw = await generateResponse([
+  {
+    role: "user",
+    content: companyPrompt,
+  },
+]);
+
+const company = companyRaw.trim();
+
+console.log("[COMPANY]", company);
+
+    const officialHandle =
+  await findTwitterHandle(company);
+
+console.log("[HANDLE]", officialHandle);
+    
     const systemPrompt = `
 You are an AI consumer complaint assistant.
 
@@ -46,6 +71,13 @@ IF important information is missing:
 IF enough information exists:
 - set needs_more_info to false
 - generate a strong complaint tweet
+
+Official X handle (if verified):
+${officialHandle || "Not found"}
+
+If official handle is unavailable:
+- intelligently infer likely handle
+- avoid random hallucinated handles
 
 Return ONLY valid JSON in this exact format:
 
