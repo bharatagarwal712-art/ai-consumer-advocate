@@ -34,6 +34,8 @@ console.log("[COMPANY]", company);
     const officialHandle =
   await findTwitterHandle(company);
 
+    console.log("[OFFICIAL HANDLE]", officialHandle);
+
 console.log("[HANDLE]", officialHandle);
 
     console.log("[COMPANY RAW]", companyRaw);
