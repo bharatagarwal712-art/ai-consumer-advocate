@@ -1,30 +1,39 @@
 import {
   BedrockRuntimeClient,
-  InvokeModelCommand,
+  ConverseCommand,
 } from "@aws-sdk/client-bedrock-runtime";
 
 const client = new BedrockRuntimeClient({
   region: process.env.AWS_REGION!,
 });
 
-export async function generateResponse(prompt: string) {
-  const command = new InvokeModelCommand({
+export async function generateResponse(messages: any[]) {
+  const command = new ConverseCommand({
     modelId: process.env.BEDROCK_MODEL_ID!,
-    contentType: "application/json",
-    accept: "application/json",
 
-    body: JSON.stringify({
-      prompt: prompt,
-      max_tokens: 1000,
+    messages: messages.map((m) => ({
+      role: m.role === "system" ? "user" : m.role,
+      content: [
+        {
+          text: m.content,
+        },
+      ],
+    })),
+
+    inferenceConfig: {
+      maxTokens: 1000,
       temperature: 0.7,
-    }),
+    },
   });
 
   const response = await client.send(command);
 
-  const decoded = new TextDecoder().decode(response.body);
+  const text =
+    response.output?.message?.content?.[0]?.text;
 
-  console.log(decoded);
+  if (!text) {
+    throw new Error("No response text found.");
+  }
 
-  return decoded;
+  return text;
 }
