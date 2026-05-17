@@ -35,6 +35,9 @@ console.log("[COMPANY]", company);
   await findTwitterHandle(company);
 
 console.log("[HANDLE]", officialHandle);
+
+    console.log("[COMPANY RAW]", companyRaw);
+console.log("[COMPANY CLEAN]", company);
     
     const systemPrompt = `
 You are an AI consumer complaint assistant.
