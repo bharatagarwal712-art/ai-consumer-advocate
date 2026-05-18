@@ -1,6 +1,6 @@
 
 export async function findTwitterHandle(
-  conversation: string
+  company: string
 ): Promise<string | null> {
   try {
     const response = await fetch(
@@ -13,11 +13,7 @@ export async function findTwitterHandle(
           "Content-Type": "application/json",
         },
 body: JSON.stringify({
-  q: `
-${conversation}
-
-official company twitter/x handle site:x.com`
-`,
+  q: `${company} official X account site:x.com`,
 }),
       }
     );
