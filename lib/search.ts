@@ -16,7 +16,7 @@ body: JSON.stringify({
   q: `
 ${conversation}
 
-official company twitter/x handle
+official company twitter/x handle site:x.com`
 `,
 }),
       }
