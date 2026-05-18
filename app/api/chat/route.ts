@@ -36,7 +36,12 @@ const companyRaw = await generateResponse([
 let company = "";
 
 try {
-  company = JSON.parse(companyRaw).company;
+  const cleaned = companyRaw
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .trim();
+
+  company = JSON.parse(cleaned).company;
 } catch {
   company = "";
 }
