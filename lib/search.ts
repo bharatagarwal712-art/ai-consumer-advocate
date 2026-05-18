@@ -36,9 +36,12 @@ console.log("[SERPER RESPONSE]", JSON.stringify(data));
           .replace("https://twitter.com/", "")
           .split("/")[0];
 
-        if (clean) {
-          return `@${clean}`;
-        }
+       if (
+  clean &&
+  clean !== "https:"
+) {
+  return `@${clean}`;
+}
       }
     }
 
