@@ -83,6 +83,16 @@ export default function Home() {
   if (!session) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
+          <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold mb-3">
+              Rant-X
+            </h1>
+                <p className="text-zinc-400 text-lg">
+              Login to access 
+            </p>
+          </div>
         <button
           onClick={() => signIn("google")}
           className="border border-cyan-500 px-6 py-3 rounded-2xl hover:bg-cyan-500 hover:text-black transition"
@@ -100,11 +110,11 @@ export default function Home() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-3">
-              AI Consumer Advocate
+              Rant-X
             </h1>
 
             <p className="text-zinc-400 text-lg">
-              Turn frustrating experiences into clear public feedback.
+              Turn frustrating experiences into proper tweets. 
             </p>
           </div>
 
