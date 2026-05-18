@@ -11,6 +11,39 @@ export async function POST(req: NextRequest) {
     const conversation = messages
       .map((m: any) => `${m.role}: ${m.content}`)
       .join("\n");
+
+// STEP 1: Extract company name
+
+const extractCompanyPrompt = `
+Extract the company or brand name from this complaint.
+
+Return ONLY valid JSON:
+
+{
+  "company": "string"
+}
+
+Complaint:
+${conversation}
+`;
+
+const companyRaw = await generateResponse([
+  {
+    role: "user",
+    content: extractCompanyPrompt,
+  },
+]);
+
+let company = "";
+
+try {
+  company = JSON.parse(companyRaw).company;
+} catch {
+  company = "";
+}
+
+console.log("[EXTRACTED COMPANY]", company);    
+    
 const companyPrompt = `
 Extract ONLY the company name from this complaint.
 
@@ -31,8 +64,8 @@ const company = companyRaw.trim();
 
 console.log("[COMPANY]", company);
 
-    const officialHandle =
-  await findTwitterHandle(conversation);
+  const officialHandle =
+await findTwitterHandle(company);
 
     console.log("[OFFICIAL HANDLE]", officialHandle);
 
