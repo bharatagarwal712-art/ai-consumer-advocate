@@ -12,9 +12,8 @@ export async function POST(req: NextRequest) {
       .map((m: any) => `${m.role}: ${m.content}`)
       .join("\n");
 
-// STEP 1: Extract company name
-
-const extractCompanyPrompt = `
+    
+const companyPrompt = `
 Extract the company or brand name from this complaint.
 
 Return ONLY valid JSON:
@@ -30,7 +29,7 @@ ${conversation}
 const companyRaw = await generateResponse([
   {
     role: "user",
-    content: extractCompanyPrompt,
+    content: companyPrompt,
   },
 ]);
 
@@ -42,37 +41,14 @@ try {
   company = "";
 }
 
-console.log("[EXTRACTED COMPANY]", company);
-    
-const companyPrompt = `
-Extract ONLY the company name from this complaint.
-
-Complaint:
-${conversation}
-
-Return ONLY the company name.
-`;
-
-const companyRaw = await generateResponse([
-  {
-    role: "user",
-    content: companyPrompt,
-  },
-]);
-
-const company = companyRaw.trim();
-
 console.log("[COMPANY]", company);
 
-  const officialHandle =
-await findTwitterHandle(company);
+const officialHandle =
+  await findTwitterHandle(company);
 
-    console.log("[OFFICIAL HANDLE]", officialHandle);
+console.log("[OFFICIAL HANDLE]", officialHandle);
 
-console.log("[HANDLE]", officialHandle);
-
-    console.log("[COMPANY RAW]", companyRaw);
-console.log("[COMPANY CLEAN]", company);
+console.log("[COMPANY RAW]", companyRaw);
     
     const systemPrompt = `
 You are an AI consumer complaint assistant.
