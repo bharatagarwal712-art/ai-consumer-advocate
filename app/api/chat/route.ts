@@ -42,7 +42,7 @@ try {
   company = "";
 }
 
-console.log("[EXTRACTED COMPANY]", company);    
+console.log("[EXTRACTED COMPANY]", company);
     
 const companyPrompt = `
 Extract ONLY the company name from this complaint.
