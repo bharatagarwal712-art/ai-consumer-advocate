@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Twitter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
@@ -20,6 +20,12 @@ export default function TweetPanel({ tweet, tone, setTone }: Props) {
     navigator.clipboard.writeText(tweet);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  function handlePost() {
+    if (!tweet) return;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`;
+    window.open(url, "_blank");
   }
 
   return (
@@ -100,32 +106,51 @@ export default function TweetPanel({ tweet, tone, setTone }: Props) {
         </AnimatePresence>
       </div>
 
-      {/* Copy button */}
-      <button
-        onClick={handleCopy}
-        disabled={!tweet}
-        className={`
-          mt-5 w-full py-3.5 sm:py-4 rounded-2xl flex items-center justify-center gap-2.5
-          font-sora font-bold text-sm sm:text-base tracking-wide transition-all duration-200
-          ${
-            tweet
-              ? "btn-primary"
-              : "bg-surface-container-high text-on-surface-muted cursor-not-allowed"
-          }
-        `}
-      >
-        {copied ? (
-          <>
-            <Check className="w-5 h-5" />
-            COPIED!
-          </>
-        ) : (
-          <>
-            <Copy className="w-5 h-5" />
-            COPY TWEET
-          </>
-        )}
-      </button>
+      {/* Action buttons */}
+      <div className="mt-5 flex gap-3">
+        <button
+          onClick={handleCopy}
+          disabled={!tweet}
+          className={`
+            flex-1 py-3.5 sm:py-4 rounded-2xl flex items-center justify-center gap-2.5
+            font-sora font-bold text-sm sm:text-base tracking-wide transition-all duration-200
+            ${
+              tweet
+                ? "btn-primary"
+                : "bg-surface-container-high text-on-surface-muted cursor-not-allowed"
+            }
+          `}
+        >
+          {copied ? (
+            <>
+              <Check className="w-5 h-5" />
+              COPIED!
+            </>
+          ) : (
+            <>
+              <Copy className="w-5 h-5" />
+              COPY
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={handlePost}
+          disabled={!tweet}
+          className={`
+            flex-1 py-3.5 sm:py-4 rounded-2xl flex items-center justify-center gap-2.5
+            font-sora font-bold text-sm sm:text-base tracking-wide transition-all duration-200
+            ${
+              tweet
+                ? "btn-cyan"
+                : "bg-surface-container-high text-on-surface-muted cursor-not-allowed"
+            }
+          `}
+        >
+          <Twitter className="w-5 h-5" />
+          POST
+        </button>
+      </div>
     </motion.div>
   );
 }
